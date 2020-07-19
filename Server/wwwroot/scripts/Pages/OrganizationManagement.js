@@ -13,6 +13,9 @@ document.getElementById("invitesHelpButton").addEventListener("click", (ev) => {
 document.getElementById("deviceGroupHelpButton").addEventListener("click", (ev) => {
     ShowModal("Device Groups", `Device groups can be used to organize and filter computers on the grid.`);
 });
+document.getElementById("managedOrganizationHelpButton").addEventListener("click", (ev) => {
+    ShowModal("Managed Organization IDs", `Administrators will have access to these Organizations' devices and server logs.`);
+});
 document.getElementById("addUsersToDeviceGroupButton").addEventListener("click", (ev) => {
     var selectList = document.getElementById("deviceGroupList");
     if (selectList.selectedOptions.length == 0) {
@@ -266,4 +269,37 @@ function showError(xhr) {
     console.error(xhr);
     ShowModal("Error", "There was an error saving the data.", "", () => { location.reload(); });
 }
+document.getElementById("managedOrganizationRemoveButton").addEventListener("click", (ev) => {
+    var selectList = document.getElementById("managedOrganizationList");
+    var selectedValues = [];
+    for (var i = 0; i < selectList.selectedOptions.length; i++) {
+        selectedValues.push(selectList.selectedOptions[i].value);
+    }
+    selectedValues.forEach(x => {
+        let xhr = new XMLHttpRequest();
+        xhr.onload = (ev) => {
+            console.log(ev.srcElement);
+            if (xhr.status == 200) {
+                document.querySelector(`#managedOrganizationList option[value='${x}']`).remove();
+            }
+            else if (xhr.status == 400) {
+                ShowModal("Invalid Request", xhr.responseText);
+            }
+            else {
+                showError(xhr);
+            }
+        };
+        xhr.onerror = () => {
+            showError(xhr);
+        };
+        xhr.open("delete", location.origin + "/api/OrganizationManagement/ManagedOrganization");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.send(JSON.stringify(x));
+    });
+});
+document.getElementById("managedOrganizationInput").addEventListener("keypress", (e) => {
+    if (e.key.toLowerCase() == "enter") {
+        document.getElementById("managedOrganizationAddButton").click();
+    }
+});
 //# sourceMappingURL=OrganizationManagement.js.map

@@ -90,6 +90,43 @@ namespace Remotely.Server.Services
             return true;
         }
 
+        public bool AddManagedOrganization(string userID, string orgID, out string errorMsg)
+        {
+            errorMsg = null;
+            if (!(orgID?.Length > 0))
+            {
+                errorMsg = "Organization ID is empty.";
+                return false;
+            }
+            var org = RemotelyContext.Organizations.Find(orgID.ToLower());
+            if (org == null)
+            {
+                errorMsg = "Organization ID does not exist.";
+                return false;
+            }
+            var pair = RemotelyContext.ManagedOrganization.Find( new [] { userID, orgID } );
+            if (pair != null)
+            {
+                errorMsg = "Organization ID already exists.";
+                return false;
+            }
+            try
+            {
+                RemotelyContext.ManagedOrganization.Add(new ManagedOrganization()
+                {
+                    UserID = userID,
+                    OrganizationID = orgID,
+                });
+                
+                RemotelyContext.SaveChanges();
+                return true;
+            } 
+            catch
+            {
+                return false;
+            }
+        }
+
         public InviteLink AddInvite(string orgID, Invite invite)
         {
             invite.InvitedUser = invite.InvitedUser.ToLower();
@@ -385,6 +422,17 @@ namespace Remotely.Server.Services
             RemotelyContext.SaveChanges();
         }
 
+
+        public void DeleteManagedOrganization(string userID, string orgID)
+        {
+            var org = RemotelyContext.ManagedOrganization.FirstOrDefault(x =>
+                x.OrganizationID == orgID.ToLower() &&
+                x.UserID == userID);
+
+            RemotelyContext.ManagedOrganization.Remove(org);
+            RemotelyContext.SaveChangesAsync();
+        }
+
         public void DeleteInvite(string orgID, string inviteID)
         {
             var invite = RemotelyContext.InviteLinks.FirstOrDefault(x =>
@@ -665,6 +713,29 @@ namespace Remotely.Server.Services
                 query = query.Where(x => x.Message.ToLower().Contains(message));
             }
             return query;
+        }
+
+        public IEnumerable<string> GetManagedOrganizationIDs(string userID)
+        {
+            if (userID == null)
+            {
+                return null;
+            }
+            return RemotelyContext.ManagedOrganization
+                .Include(x => x.Organization)
+                .Where(x => x.UserID == userID)
+                .Select(x => x.Organization.ID);
+        }
+
+        public IEnumerable<string> GetManagedOrganizationIDsByName(string user)
+        {
+            if (user == null)
+            {
+                return null;
+            }
+            var userID = RemotelyContext.Users
+                .First(x => x.UserName == user)?.Id;
+            return GetManagedOrganizationIDs(userID);
         }
 
         public int GetOrganizationCount()

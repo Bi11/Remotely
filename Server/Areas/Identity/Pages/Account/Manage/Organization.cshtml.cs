@@ -23,6 +23,7 @@ namespace Remotely.Server.Areas.Identity.Pages.Account.Manage
         }
         public List<SelectListItem> DeviceGroupSelectItems { get; } = new List<SelectListItem>();
         public List<DeviceGroup> DeviceGroups { get; } = new List<DeviceGroup>();
+        public List<string> ManagedOrganizations { get; } = new List<string>();
 
         [BindProperty]
         public InputModel Input { get; set; } = new InputModel();
@@ -80,6 +81,30 @@ namespace Remotely.Server.Areas.Identity.Pages.Account.Manage
                     return Page();
                 }
                 StatusMessage = "Device group created.";
+                return RedirectToPage();
+            }
+            PopulateViewModel();
+            return Page();
+        }
+
+        public async Task<IActionResult> OnPostAddManagedOrganizationAsync()
+        {
+            var currentUser = await UserManager.FindByEmailAsync(User.Identity.Name);
+            if (!currentUser.IsAdministrator)
+            {
+                return RedirectToPage("Index");
+            }
+
+            if (ModelState.IsValid)
+            {
+                var result = DataService.AddManagedOrganization(currentUser.Id, Input.ManagedOrganizationID, out var errorMsg);
+                if (!result)
+                {
+                    PopulateViewModel();
+                    ModelState.AddModelError("AddManagedOrganization", errorMsg);
+                    return RedirectToPage();
+                }
+                StatusMessage = "Organization ID added.";
                 return RedirectToPage();
             }
             PopulateViewModel();
@@ -154,6 +179,10 @@ namespace Remotely.Server.Areas.Identity.Pages.Account.Manage
             var deviceGroups = DataService.GetDeviceGroups(User.Identity.Name).OrderBy(x => x.Name);
             DeviceGroups.AddRange(deviceGroups);
             DeviceGroupSelectItems.AddRange(DeviceGroups.Select(x => new SelectListItem(x.Name, x.ID)));
+            var managedOrgs = DataService.GetManagedOrganizationIDsByName(User.Identity.Name);
+            if (managedOrgs?.Any() == true) {
+                ManagedOrganizations.AddRange(managedOrgs);
+            }
 
             Users = DataService.GetAllUsers(User.Identity.Name)
                 .Select(x => new OrganizationUser()
@@ -181,6 +210,9 @@ namespace Remotely.Server.Areas.Identity.Pages.Account.Manage
 
             [StringLength(200)]
             public string DeviceGroupName { get; set; }
+
+            [StringLength(200)]
+            public string ManagedOrganizationID { get; set; }
         }
     }
 

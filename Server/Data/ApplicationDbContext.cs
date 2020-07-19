@@ -28,6 +28,8 @@ namespace Remotely.Server.Data
 
         public DbSet<Organization> Organizations { get; set; }
 
+        public DbSet<ManagedOrganization> ManagedOrganization { get; set; }
+
         public new DbSet<RemotelyUser> Users { get; set; }
 
         public DbSet<EventLog> EventLogs { get; set; }
@@ -133,6 +135,9 @@ namespace Remotely.Server.Data
 
             builder.Entity<RemotelyUser>()
                 .HasIndex(x => x.UserName);
+
+            builder.Entity<ManagedOrganization>()
+                .HasKey(x => new { x.UserID, x.OrganizationID });
 
             builder.Entity<Device>()
                 .Property(x => x.Drives)

@@ -205,6 +205,20 @@ namespace Remotely.Server.API
 
         }
 
+        [HttpDelete("ManagedOrganization")]
+        [ServiceFilter(typeof(ApiAuthorizationFilter))]
+        public IActionResult ManagedOrganization([FromBody] string orgID)
+        {
+            if (User.Identity.IsAuthenticated &&
+                !DataService.GetUserByName(User.Identity.Name).IsAdministrator)
+            {
+                return Unauthorized();
+            }
+
+            DataService.DeleteManagedOrganization(DataService.GetUserByName(User.Identity.Name).Id, orgID);
+            return Ok("ok");
+        }
+
         [HttpPut("Name")]
         [ServiceFilter(typeof(ApiAuthorizationFilter))]
         public IActionResult Name([FromBody]string organizationName)
