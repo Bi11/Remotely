@@ -670,12 +670,13 @@ namespace Remotely.Server.Services
         {
             var user = RemotelyContext.Users.FirstOrDefault(x => x.UserName == userName);
             var userID = user.Id;
+            var managedOrgs = GetManagedOrganizationIDs(userID) ?? Array.Empty<string>();
 
             return RemotelyContext.Devices
                 .Include(x => x.DeviceGroup)
                 .ThenInclude(x => x.PermissionLinks)
                 .Where(x =>
-                    x.OrganizationID == user.OrganizationID &&
+                    (x.OrganizationID == user.OrganizationID || managedOrgs.Contains(x.OrganizationID)) &&
                     (
                         user.IsAdministrator ||
                         x.DeviceGroup.PermissionLinks.Count == 0 ||
@@ -700,7 +701,8 @@ namespace Remotely.Server.Services
             else
             {
                 var orgID = user.OrganizationID;
-                query = query.Where(x => x.OrganizationID == orgID && x.TimeStamp >= fromDate && x.TimeStamp <= toDate)
+                var managedOrgs = GetManagedOrganizationIDs(user.Id) ?? Array.Empty<string>();
+                query = query.Where(x => (x.OrganizationID == orgID || managedOrgs.Contains(x.OrganizationID)) && x.TimeStamp >= fromDate && x.TimeStamp <= toDate)
                         .OrderByDescending(x => x.TimeStamp);
             }
             if (type != null)
