@@ -223,7 +223,7 @@
 
     }
 
-    @if (AppConfig.JuinorAdmins.Contains(currentUser.Email))
+    @if (AppConfig.JuinorAdmins?.Contains(currentUser.Email) == true)
     {
         <div class="row">
             <div class="col-sm-8">

@@ -671,7 +671,7 @@ namespace Remotely.Server.Services
             var user = RemotelyContext.Users.FirstOrDefault(x => x.UserName == userName);
             var userID = user.Id;
             IEnumerable<string> managedOrgs = Array.Empty<string>();
-            if (AppConfig.JuinorAdmins.Contains(user.Email, StringComparer.OrdinalIgnoreCase))
+            if (AppConfig.JuinorAdmins?.Contains(user.Email, StringComparer.OrdinalIgnoreCase) == true)
             {
                 managedOrgs = GetManagedOrganizationIDs(userID) ?? Array.Empty<string>();
             }
@@ -706,7 +706,7 @@ namespace Remotely.Server.Services
             {
                 var orgID = user.OrganizationID;
                 IEnumerable<string> managedOrgs = Array.Empty<string>();
-                if (AppConfig.JuinorAdmins.Contains(user.Email, StringComparer.OrdinalIgnoreCase))
+                if (AppConfig.JuinorAdmins?.Contains(user.Email, StringComparer.OrdinalIgnoreCase) == true)
                 {
                     managedOrgs = GetManagedOrganizationIDs(user.Id) ?? Array.Empty<string>();
                 }
