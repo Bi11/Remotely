@@ -476,10 +476,16 @@ namespace Remotely.Server.Services
 
         public bool DoesUserHaveAccessToDevice(string deviceID, RemotelyUser remotelyUser)
         {
+            string userID = remotelyUser.Id;
+            IEnumerable<string> managedOrgs = Array.Empty<string>();
+            if (AppConfig.JuinorAdmins?.Contains(remotelyUser.Email, StringComparer.OrdinalIgnoreCase) == true)
+            {
+                managedOrgs = GetManagedOrganizationIDs(userID) ?? Array.Empty<string>();
+            }
             return RemotelyContext.Devices
                 .Include(x => x.DeviceGroup)
                 .ThenInclude(x => x.PermissionLinks)
-                .Any(device => device.OrganizationID == remotelyUser.OrganizationID &&
+                .Any(device => (device.OrganizationID == remotelyUser.OrganizationID || managedOrgs.Contains(device.OrganizationID)) &&
                     device.ID == deviceID &&
                     (
                         remotelyUser.IsAdministrator ||
@@ -497,11 +503,17 @@ namespace Remotely.Server.Services
 
         public string[] FilterDeviceIDsByUserPermission(string[] deviceIDs, RemotelyUser remotelyUser)
         {
+            string userID = remotelyUser.Id;
+            IEnumerable<string> managedOrgs = Array.Empty<string>();
+            if (AppConfig.JuinorAdmins?.Contains(remotelyUser.Email, StringComparer.OrdinalIgnoreCase) == true)
+            {
+                managedOrgs = GetManagedOrganizationIDs(userID) ?? Array.Empty<string>();
+            }
             return RemotelyContext.Devices
                 .Include(x => x.DeviceGroup)
                 .ThenInclude(x => x.PermissionLinks)
                 .Where(device =>
-                    device.OrganizationID == remotelyUser.OrganizationID &&
+                    (device.OrganizationID == remotelyUser.OrganizationID || managedOrgs.Contains(device.OrganizationID)) &&
                     deviceIDs.Contains(device.ID) &&
                     (
                         remotelyUser.IsAdministrator ||
