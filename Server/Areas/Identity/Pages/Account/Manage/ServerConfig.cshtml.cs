@@ -157,6 +157,9 @@ namespace Remotely.Server.Areas.Identity.Pages.Account.Manage
             [Display(Name = "Ice Servers")]
             public IceServerModel[] IceServers { get; set; }
 
+            [Display(Name = "Juinor Admins")]
+            public string[] JuinorAdmins { get; set; }
+
             [Display(Name = "Known Proxies")]
             public string[] KnownProxies { get; set; }
 

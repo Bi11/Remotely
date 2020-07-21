@@ -16,6 +16,11 @@ var serverAdminsRemoveButton = document.getElementById("serverAdminsRemoveButton
 var serverAdminsInput = document.getElementById("serverAdminsInput") as HTMLInputElement;
 var serverAdminsSelect = document.getElementById("serverAdminsSelect") as HTMLSelectElement;
 
+var juinorAdminsAddButton = document.getElementById("juinorAdminsAddButton") as HTMLButtonElement;
+var juinorAdminsRemoveButton = document.getElementById("juinorAdminsRemoveButton") as HTMLButtonElement;
+var juinorAdminsInput = document.getElementById("juinorAdminsInput") as HTMLInputElement;
+var juinorAdminsSelect = document.getElementById("juinorAdminsSelect") as HTMLSelectElement;
+
 serverConfigSaveButton.addEventListener("click", e => {
     for (var i = 0; i < trustedCorsSelect.options.length; i++) {
         trustedCorsSelect.options[i].selected = true;
@@ -25,6 +30,9 @@ serverConfigSaveButton.addEventListener("click", e => {
     }
     for (var i = 0; i < serverAdminsSelect.options.length; i++) {
         serverAdminsSelect.options[i].selected = true;
+    }
+    for (var i = 0; i < juinorAdminsSelect.options.length; i++) {
+        juinorAdminsSelect.options[i].selected = true;
     }
 
     serverConfigForm.submit();
@@ -101,5 +109,30 @@ serverAdminsInput.addEventListener("keypress", ev => {
 serverAdminsRemoveButton.addEventListener("click", ev => {
     while (serverAdminsSelect.selectedOptions.length > 0) {
         serverAdminsSelect.selectedOptions[0].remove();
+    }
+});
+
+
+juinorAdminsAddButton.addEventListener("click", ev => {
+    if (juinorAdminsInput.value.length > 0) {
+        var option = document.createElement("option");
+        option.value = juinorAdminsInput.value;
+        option.text = juinorAdminsInput.value;
+        juinorAdminsSelect.add(option);
+        juinorAdminsInput.value = "";
+    }
+});
+
+juinorAdminsInput.addEventListener("keypress", ev => {
+    if (ev.key.toLowerCase() == "enter") {
+        ev.preventDefault();
+        ev.stopPropagation();
+        juinorAdminsAddButton.click();
+    }
+})
+
+juinorAdminsRemoveButton.addEventListener("click", ev => {
+    while (juinorAdminsSelect.selectedOptions.length > 0) {
+        juinorAdminsSelect.selectedOptions[0].remove();
     }
 });

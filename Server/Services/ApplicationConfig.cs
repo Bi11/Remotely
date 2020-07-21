@@ -22,6 +22,7 @@ namespace Remotely.Server.Services
         public string DefaultPrompt => Config["ApplicationOptions:DefaultPrompt"] ?? "~>";
         public bool EnableWindowsEventLog => bool.Parse(Config["ApplicationOptions:EnableWindowsEventLog"]);
         public IceServerModel[] IceServers => Config.GetSection("ApplicationOptions:IceServers").Get<IceServerModel[]>() ?? fallbackIceServers;
+        public string[] JuinorAdmins => Config.GetSection("ApplicationOptions:JuinorAdmins").Get<string[]>();
         public string[] KnownProxies => Config.GetSection("ApplicationOptions:KnownProxies").Get<string[]>();
         public int MaxConcurrentUpdates => int.Parse(Config["ApplicationOptions:MaxConcurrentUpdates"] ?? "10");
         public int MaxOrganizationCount => int.Parse(Config["ApplicationOptions:MaxOrganizationCount"] ?? "1");

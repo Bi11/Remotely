@@ -12,6 +12,10 @@ var serverAdminsAddButton = document.getElementById("serverAdminsAddButton");
 var serverAdminsRemoveButton = document.getElementById("serverAdminsRemoveButton");
 var serverAdminsInput = document.getElementById("serverAdminsInput");
 var serverAdminsSelect = document.getElementById("serverAdminsSelect");
+var juinorAdminsAddButton = document.getElementById("juinorAdminsAddButton");
+var juinorAdminsRemoveButton = document.getElementById("juinorAdminsRemoveButton");
+var juinorAdminsInput = document.getElementById("juinorAdminsInput");
+var juinorAdminsSelect = document.getElementById("juinorAdminsSelect");
 serverConfigSaveButton.addEventListener("click", e => {
     for (var i = 0; i < trustedCorsSelect.options.length; i++) {
         trustedCorsSelect.options[i].selected = true;
@@ -21,6 +25,9 @@ serverConfigSaveButton.addEventListener("click", e => {
     }
     for (var i = 0; i < serverAdminsSelect.options.length; i++) {
         serverAdminsSelect.options[i].selected = true;
+    }
+    for (var i = 0; i < juinorAdminsSelect.options.length; i++) {
+        juinorAdminsSelect.options[i].selected = true;
     }
     serverConfigForm.submit();
 });
@@ -85,6 +92,27 @@ serverAdminsInput.addEventListener("keypress", ev => {
 serverAdminsRemoveButton.addEventListener("click", ev => {
     while (serverAdminsSelect.selectedOptions.length > 0) {
         serverAdminsSelect.selectedOptions[0].remove();
+    }
+});
+juinorAdminsAddButton.addEventListener("click", ev => {
+    if (juinorAdminsInput.value.length > 0) {
+        var option = document.createElement("option");
+        option.value = juinorAdminsInput.value;
+        option.text = juinorAdminsInput.value;
+        juinorAdminsSelect.add(option);
+        juinorAdminsInput.value = "";
+    }
+});
+juinorAdminsInput.addEventListener("keypress", ev => {
+    if (ev.key.toLowerCase() == "enter") {
+        ev.preventDefault();
+        ev.stopPropagation();
+        juinorAdminsAddButton.click();
+    }
+});
+juinorAdminsRemoveButton.addEventListener("click", ev => {
+    while (juinorAdminsSelect.selectedOptions.length > 0) {
+        juinorAdminsSelect.selectedOptions[0].remove();
     }
 });
 //# sourceMappingURL=ServerConfig.js.map

@@ -1,6 +1,7 @@
 ﻿@page
 @model OrganizationModel
 @inject DataService  DataService
+@inject Remotely.Server.Services.ApplicationConfig AppConfig
 @{
     ViewData["Title"] = "Manage Organization";
     var currentUser = DataService.GetUserByName(User.Identity.Name);
@@ -222,31 +223,34 @@
 
     }
 
-    <div class="row">
-        <div class="col-sm-8">
+    @if (AppConfig.JuinorAdmins.Contains(currentUser.Email))
+    {
+        <div class="row">
+            <div class="col-sm-8">
 
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            @* Managed Organizations *@
-            <form asp-page-handler="AddManagedOrganization">
-                <div class="form-group">
-                    <label class="mb-1">Managed Organization IDs</label>
-                    <span id="managedOrganizationHelpButton" class="fas fa-question-circle pointer"></span>
-                    <select id="managedOrganizationList" multiple asp-items="Model.ManagedOrganizations?.Select(x=>new SelectListItem(x,x))" class="form-control all-device-groups-list mb-1">
-                    </select>
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                @* Managed Organizations *@
+                <form asp-page-handler="AddManagedOrganization">
+                    <div class="form-group">
+                        <label class="mb-1">Managed Organization IDs</label>
+                        <span id="managedOrganizationHelpButton" class="fas fa-question-circle pointer"></span>
+                        <select id="managedOrganizationList" multiple asp-items="Model.ManagedOrganizations?.Select(x => new SelectListItem(x, x))" class="form-control all-device-groups-list mb-1">
+                        </select>
 
-                    <div class="text-right mb-3">
-                        <button id="managedOrganizationRemoveButton" type="button" class="btn btn-secondary">Remove</button>
+                        <div class="text-right mb-3">
+                            <button id="managedOrganizationRemoveButton" type="button" class="btn btn-secondary">Remove</button>
+                        </div>
+
+                        <div class="input-group">
+                            <input id="managedOrganizationInput" placeholder="Organization ID to be managed" asp-for="Input.ManagedOrganizationID" class="form-control" maxlength="200" />
+                            <button id="managedOrganizationAddButton" type="submit" class="btn btn-secondary">Add</button>
+                        </div>
                     </div>
+                </form>
 
-                    <div class="input-group">
-                        <input id="managedOrganizationInput" placeholder="Organization ID to be managed" asp-for="Input.ManagedOrganizationID" class="form-control" maxlength="200" />
-                        <button id="managedOrganizationAddButton" type="submit" class="btn btn-secondary">Add</button>
-                    </div>
-                </div>
-            </form>
-
+            </div>
         </div>
-    </div>
+    }
 
     <script type="module" src="~/scripts/Pages/OrganizationManagement.js">
     </script>
