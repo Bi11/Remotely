@@ -670,7 +670,11 @@ namespace Remotely.Server.Services
         {
             var user = RemotelyContext.Users.FirstOrDefault(x => x.UserName == userName);
             var userID = user.Id;
-            var managedOrgs = GetManagedOrganizationIDs(userID) ?? Array.Empty<string>();
+            IEnumerable<string> managedOrgs = Array.Empty<string>();
+            if (AppConfig.JuinorAdmins.Contains(user.Email, StringComparer.OrdinalIgnoreCase))
+            {
+                managedOrgs = GetManagedOrganizationIDs(userID) ?? Array.Empty<string>();
+            }
 
             return RemotelyContext.Devices
                 .Include(x => x.DeviceGroup)
@@ -701,7 +705,11 @@ namespace Remotely.Server.Services
             else
             {
                 var orgID = user.OrganizationID;
-                var managedOrgs = GetManagedOrganizationIDs(user.Id) ?? Array.Empty<string>();
+                IEnumerable<string> managedOrgs = Array.Empty<string>();
+                if (AppConfig.JuinorAdmins.Contains(user.Email, StringComparer.OrdinalIgnoreCase))
+                {
+                    managedOrgs = GetManagedOrganizationIDs(user.Id) ?? Array.Empty<string>();
+                }
                 query = query.Where(x => (x.OrganizationID == orgID || managedOrgs.Contains(x.OrganizationID)) && x.TimeStamp >= fromDate && x.TimeStamp <= toDate)
                         .OrderByDescending(x => x.TimeStamp);
             }
